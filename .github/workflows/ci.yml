@@ -1,0 +1,47 @@
+name: CI
+
+on:
+  pull_request:
+    branches: [main]
+  push:
+    branches: [main]
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  quality:
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:16-alpine
+        env:
+          POSTGRES_USER: vsa
+          POSTGRES_PASSWORD: vsa
+          POSTGRES_DB: vsa
+        ports: ['5432:5432']
+        options: >-
+          --health-cmd "pg_isready -U vsa" --health-interval 5s
+          --health-timeout 5s --health-retries 10
+    env:
+      DATABASE_URL: postgresql://vsa:vsa@localhost:5432/vsa?schema=public
+      JWT_ISSUER: https://issuer.test/v2.0
+      JWT_AUDIENCE: api://vsa-test
+      JWT_DEV_SECRET: test-secret-must-be-at-least-32-characters-long
+      VENDOR_TOKEN_PEPPER: test-pepper-must-be-at-least-32-characters-long
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+      - run: npm ci
+      - name: Generate Prisma client
+        run: npm run db:generate
+      - name: Typecheck
+        run: npm run typecheck
+      - name: Lint
+        run: npm run lint --if-present
+      - name: Unit tests
+        run: npm test

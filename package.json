@@ -1,0 +1,43 @@
+{
+  "name": "vsa-platform",
+  "private": true,
+  "version": "0.1.0",
+  "description": "Vendor Security Assessment Platform",
+  "workspaces": [
+    "apps/*",
+    "packages/*",
+    "db"
+  ],
+  "engines": {
+    "node": ">=20.0.0",
+    "npm": ">=10.0.0"
+  },
+  "scripts": {
+    "dev": "npm run dev --workspace=@vsa/api",
+    "dev:web": "npm run dev --workspace=@vsa/web",
+    "dev:all": "npm-run-all --parallel dev dev:web",
+    "build": "npm run build --workspaces --if-present",
+    "lint": "npm run lint --workspaces --if-present",
+    "typecheck": "npm run typecheck --workspaces --if-present",
+    "test": "npm run test --workspaces --if-present",
+    "db:generate": "npm run generate --workspace=@vsa/db",
+    "db:migrate": "npm run migrate --workspace=@vsa/db",
+    "db:migrate:deploy": "npm run migrate:deploy --workspace=@vsa/db",
+    "db:seed": "npm run seed --workspace=@vsa/db",
+    "db:reset": "npm run reset --workspace=@vsa/db",
+    "docker:up": "docker compose up -d",
+    "docker:down": "docker compose down",
+    "docker:reset": "docker compose down -v && docker compose up -d"
+  },
+  "devDependencies": {
+    "@types/node": "^20.11.0",
+    "@typescript-eslint/eslint-plugin": "^7.0.0",
+    "@typescript-eslint/parser": "^7.0.0",
+    "eslint": "^8.57.0",
+    "eslint-config-prettier": "^9.1.0",
+    "npm-run-all": "^4.1.5",
+    "prettier": "^3.2.5",
+    "tsx": "^4.7.0",
+    "typescript": "^5.4.0"
+  }
+}

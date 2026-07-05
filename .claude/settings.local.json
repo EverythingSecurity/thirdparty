@@ -1,0 +1,7 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(grep -v \"^/Users/caira/3vendor/[A-Z][A-Z_]*\\\\.md$\")"
+    ]
+  }
+}

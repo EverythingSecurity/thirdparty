@@ -1,0 +1,31 @@
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: vsa-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: vsa
+      POSTGRES_PASSWORD: vsa
+      POSTGRES_DB: vsa
+    ports:
+      - '5432:5432'
+    volumes:
+      - vsa-pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready -U vsa -d vsa']
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  redis:
+    image: redis:7-alpine
+    container_name: vsa-redis
+    restart: unless-stopped
+    ports:
+      - '6379:6379'
+    volumes:
+      - vsa-redisdata:/data
+
+volumes:
+  vsa-pgdata:
+  vsa-redisdata:

@@ -1,0 +1,351 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet data-dc-atomics>
+<meta name="design_doc_mode" content="canvas">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Kalam:wght@300;400;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+ body{margin:0;background:#e4e1db;font-family:'Kalam',system-ui,sans-serif;color:#2c2925}
+ .dv-turn{padding:38px 44px 42px;border-bottom:1px solid rgba(0,0,0,.1)}
+ .dv-thd{display:flex;align-items:baseline;gap:12px;margin:0 0 8px}
+ .dv-tid{font:700 11px 'Space Mono',monospace;padding:3px 8px;background:#2c2925;color:#fff;border-radius:4px;text-decoration:none}
+ .dv-tname{font:400 21px 'Kalam';color:#2c2925}
+ .dv-intro{font:400 14px/1.5 'Kalam';color:#6b665e;max-width:660px;margin:0 0 4px}
+ .wf-group{margin:34px 0 0}
+ .wf-gh{display:flex;align-items:center;gap:10px;font:700 15px 'Kalam';color:#2c2925;margin:0 0 18px;padding-bottom:8px;border-bottom:1.5px dashed #b8b3a9}
+ .wf-gh .gtag{font:700 10px 'Space Mono',monospace;background:#c9c4ba;color:#2c2925;padding:2px 7px;border-radius:3px}
+ .wf-gh .gnote{font:400 11px 'Space Mono',monospace;color:#8a857c;margin-left:auto}
+ .dv-opts{display:flex;flex-wrap:wrap;gap:28px;align-items:flex-start}
+ .dv-opt{flex:none;display:flex;flex-direction:column;gap:9px;scroll-margin-top:16px}
+ .dv-olabel{display:flex;align-items:baseline;gap:8px;font:400 12.5px 'Kalam';color:#6b665e;max-width:460px}
+ .dv-oid{font:700 11px 'Space Mono',monospace;padding:3px 7px;background:rgba(0,0,0,.09);color:#2c2925;border-radius:5px;text-decoration:none;flex:none}
+ .dv-opt:target .dv-oid{background:#3a6ea5;color:#fff}
+ .dv-next{margin:30px 0 0;font:400 13.5px/1.6 'Kalam';color:#6b665e}
+ .dv-next a{color:#3a6ea5;text-decoration:none}
+ .dv-next b{color:#2c2925;font-weight:700}
+ /* wireframe primitives */
+ .fr{background:#fbfaf8;border:1.6px solid #37342f;border-radius:12px 9px 13px 8px;box-shadow:3px 4px 0 rgba(55,52,47,.13);overflow:hidden}
+ .top{display:flex;align-items:center;gap:8px;padding:8px 12px;background:#efece6;border-bottom:1.4px solid #37342f;font:700 9.5px 'Space Mono',monospace;color:#4a453e;letter-spacing:.3px}
+ .top .dot{width:8px;height:8px;border-radius:50%;border:1.4px solid #37342f;flex:none}
+ .ftok{margin-left:auto;font:700 8.5px 'Space Mono';background:#e0c9a6;border:1.2px solid #37342f;padding:2px 6px;border-radius:3px;color:#5c4a2e}
+ .body{display:flex}
+ .rail{width:118px;flex:none;border-right:1.4px dashed #b8b3a9;padding:12px 10px;display:flex;flex-direction:column;gap:9px;background:#f4f1ec}
+ .navi{font:400 12px 'Kalam';color:#4a453e;display:flex;align-items:center;gap:6px}
+ .navi .bul{width:12px;height:12px;border:1.4px solid #6b665e;border-radius:3px;flex:none}
+ .main{flex:1;padding:14px;display:flex;flex-direction:column;gap:11px;min-width:0}
+ .h{font:700 15px 'Kalam';color:#2c2925;margin:0}
+ .h2{font:700 13px 'Kalam';color:#2c2925;margin:0}
+ .sub{font:400 9.5px 'Space Mono',monospace;color:#8a857c}
+ .qc{border:1.5px solid #37342f;border-radius:9px 7px 10px 6px;padding:11px;display:flex;flex-direction:column;gap:9px;background:#fff}
+ .row{display:flex;align-items:center;gap:8px}
+ .col{display:flex;flex-direction:column;gap:6px}
+ .pill{font:700 10px 'Space Mono',monospace;border:1.4px solid #37342f;padding:2px 6px;border-radius:4px;background:#e9e5de;flex:none}
+ .wt{font:700 9px 'Space Mono';border:1.2px solid #a3572f;color:#a3572f;padding:2px 5px;border-radius:10px;flex:none}
+ .ln{height:8px;background:#d5d1c9;border-radius:4px}
+ .chip{flex:1;text-align:center;font:400 11px 'Kalam';border:1.4px solid #37342f;border-radius:6px;padding:6px 4px;background:#fff}
+ .chip.no{background:#37342f;color:#fff}
+ .chip.ok{background:#dfe8df;border-color:#5a7d5a}
+ .box{border:1.4px dashed #9a958b;border-radius:6px;background:#f0ede7;padding:9px;font:400 11px 'Kalam';color:#8a857c;text-align:center}
+ .btn{font:700 11px 'Kalam';border:1.5px solid #37342f;border-radius:7px;padding:6px 12px;background:#fff;text-align:center}
+ .btn.p{background:#37342f;color:#fff}
+ .tog{display:inline-flex;border:1.4px solid #37342f;border-radius:7px;overflow:hidden;flex:none}
+ .tog span{font:700 9.5px 'Space Mono',monospace;padding:5px 9px;color:#4a453e}
+ .tog span.on{background:#37342f;color:#fff}
+ .ai{font:700 8.5px 'Space Mono',monospace;color:#5c4a2e;background:repeating-linear-gradient(45deg,#ece3d0,#ece3d0 5px,#e4d8bf 5px,#e4d8bf 10px);border:1.3px dashed #a3893a;padding:2px 7px;border-radius:4px;display:inline-block}
+ .card{border:1.5px solid #37342f;border-radius:8px 6px 9px 6px;padding:11px;background:#fff;display:flex;flex-direction:column;gap:8px}
+ .track{flex:1;height:12px;background:#e0ddd6;border:1.3px solid #37342f;border-radius:7px;overflow:hidden}
+ .fill{height:100%}
+ .tier{font:700 9px 'Space Mono';padding:2px 7px;border-radius:11px;border:1.3px solid #37342f;flex:none}
+ .num{font:700 34px 'Kalam';line-height:1;color:#2c2925}
+ .th{display:flex;font:700 9px 'Space Mono',monospace;color:#8a857c;padding:0 0 6px;border-bottom:1.4px solid #37342f}
+ .tr{display:flex;font:400 11px 'Kalam';color:#3a3630;padding:7px 0;border-bottom:1.2px dashed #cdc8be;align-items:center}
+</style>
+</helmet>
+<section class="dv-turn" id="t1">
+ <div class="dv-thd"><a class="dv-tid" href="#t1">1</a><span class="dv-tname">VSA wireframes — first pass</span></div>
+ <p class="dv-intro">Low-fi structural sketches across all four surfaces. Divergence is concentrated where you asked: <b>checklist layout</b> (A), <b>AI gap/remediation presentation</b> (B), and <b>risk-score + domain sub-scores</b> (C). Admin (D) is a single reference layout. Everything is desktop-first / tablet-friendly, RBAC-scoped per role, with token session + immutable-submit cues drawn in.</p>
+
+ <div class="wf-group">
+  <div class="wf-gh"><span class="gtag">A</span>Vendor self-assessment — question · evidence · justification<span class="gnote">respondent sees only their checklist · no scores</span></div>
+  <div class="dv-opts">
+
+   <div class="dv-opt" id="1a">
+    <div class="dv-olabel"><a class="dv-oid" href="#1a">1a</a>Stacked cards with a domain-progress rail — one question fully expanded at a time, others collapsed.</div>
+    <div class="fr" style="width:445px">
+     <div class="top"><span class="dot"></span>VENDOR PORTAL · SELF-ASSESSMENT<span class="ftok">TOKEN · EXPIRES 6d</span></div>
+     <div class="body">
+      <div class="rail">
+       <div class="sub" style="margin-bottom:2px">DOMAINS</div>
+       <div class="navi"><span class="bul" style="background:#5a7d5a;border-color:#5a7d5a"></span>Access Ctrl</div>
+       <div class="navi"><span class="bul" style="background:#37342f"></span>Third-Party</div>
+       <div class="navi"><span class="bul"></span>Incident Resp</div>
+       <div class="navi"><span class="bul"></span>Data Security</div>
+       <div class="sub" style="margin-top:auto">6 / 24 done</div>
+      </div>
+      <div class="main">
+       <div class="row" style="justify-content:space-between"><h3 class="h">Third-Party Mgmt</h3><span class="sub">Q6 OF 12</span></div>
+       <div class="qc">
+        <div class="row"><span class="pill">TPM-05.1</span><span class="wt">wt 9</span></div>
+        <div class="ln" style="width:94%"></div><div class="ln" style="width:66%"></div>
+        <div class="row"><span class="chip ok">Compliant</span><span class="chip no">Non-Comp</span><span class="chip">N/A</span></div>
+        <div class="box">⇪ &nbsp;drag evidence &nbsp;·&nbsp; browse</div>
+        <div class="box" style="text-align:left;min-height:26px;color:#b58a3a">justification — required for N/A</div>
+        <div class="sub">✓ autosaved 12:04 · resume anytime</div>
+       </div>
+       <div class="qc" style="opacity:.55;gap:5px">
+        <div class="row"><span class="pill">TPM-06</span><span class="wt">wt 9</span><span class="sub" style="margin-left:auto">▾ expand</span></div>
+        <div class="ln" style="width:78%"></div>
+       </div>
+       <div class="row" style="margin-top:2px"><span class="btn">Save &amp; exit</span><span class="btn p" style="margin-left:auto">Submit — locks ⚿</span></div>
+      </div>
+     </div>
+    </div>
+   </div>
+
+   <div class="dv-opt" id="1b">
+    <div class="dv-olabel"><a class="dv-oid" href="#1b">1b</a>Two-pane wizard — question list on the left, one focused question filling the right. Best for guided, low-anxiety completion.</div>
+    <div class="fr" style="width:445px">
+     <div class="top"><span class="dot"></span>VENDOR PORTAL · SELF-ASSESSMENT<span class="ftok">TOKEN · EXPIRES 6d</span></div>
+     <div class="body">
+      <div class="rail" style="width:140px">
+       <div class="sub">THIRD-PARTY MGMT</div>
+       <div class="navi" style="color:#5a7d5a"><span class="bul" style="background:#5a7d5a;border-color:#5a7d5a"></span>Q1–Q5 done</div>
+       <div class="navi" style="font-weight:700;color:#2c2925"><span class="bul" style="background:#37342f"></span>Q6 TPM-05.1</div>
+       <div class="navi"><span class="bul"></span>Q7 TPM-06</div>
+       <div class="navi"><span class="bul"></span>Q8 TPM-09</div>
+       <div class="navi" style="opacity:.5"><span class="bul"></span>Q9–12</div>
+       <div class="sub" style="margin-top:auto">◂ prev domain</div>
+      </div>
+      <div class="main" style="gap:10px">
+       <div class="row"><span class="pill">TPM-05.1</span><span class="wt">wt 9</span><span class="sub" style="margin-left:auto">Q6 / 12</span></div>
+       <h3 class="h" style="font-weight:400">Does the contract require breach notification within a defined SLA?</h3>
+       <div class="ln" style="width:88%"></div>
+       <div class="col" style="gap:7px">
+        <div class="chip ok" style="text-align:left;padding:8px 10px">◯ Compliant</div>
+        <div class="chip no" style="text-align:left;padding:8px 10px">● Non-Compliant</div>
+        <div class="chip" style="text-align:left;padding:8px 10px">◯ Not Applicable</div>
+       </div>
+       <div class="box" style="min-height:34px;text-align:left">Justification &amp; evidence — ⇪ attach file</div>
+       <div class="row" style="margin-top:auto"><span class="sub">✓ autosaved</span><span class="btn p" style="margin-left:auto">Next question ▸</span></div>
+      </div>
+     </div>
+    </div>
+   </div>
+
+   <div class="dv-opt" id="1c">
+    <div class="dv-olabel"><a class="dv-oid" href="#1c">1c</a>Dense grid — every question on one row, inline response, expand-in-place for evidence. For power respondents / returning vendors.</div>
+    <div class="fr" style="width:445px">
+     <div class="top"><span class="dot"></span>VENDOR PORTAL · SELF-ASSESSMENT<span class="ftok">TOKEN · EXPIRES 6d</span></div>
+     <div class="main" style="padding:13px">
+      <div class="row" style="justify-content:space-between"><h3 class="h">Third-Party Mgmt · 12 items</h3><span class="sub">6 / 12</span></div>
+      <div class="th"><span style="width:78px">CTRL</span><span style="width:32px">WT</span><span style="flex:1">QUESTION</span><span style="width:74px">RESPONSE</span><span style="width:24px">EV</span></div>
+      <div class="tr"><span style="width:78px"><span class="pill">TPM-01</span></span><span style="width:32px">10</span><span style="flex:1"><div class="ln" style="width:80%"></div></span><span style="width:74px;color:#5a7d5a;font-weight:700">Compliant ▾</span><span style="width:24px">📎</span></div>
+      <div class="tr" style="background:#faf6ee"><span style="width:78px"><span class="pill">TPM-05.1</span></span><span style="width:32px;color:#a3572f;font-weight:700">9</span><span style="flex:1"><div class="ln" style="width:88%"></div></span><span style="width:74px;color:#a3453a;font-weight:700">Non-Comp ▾</span><span style="width:24px">📎</span></div>
+      <div style="border:1.3px dashed #a3893a;border-radius:6px;background:#faf6ee;padding:9px;margin:-2px 0 4px;display:flex;flex-direction:column;gap:6px">
+       <div class="box" style="text-align:left">justification — required</div>
+       <div class="box">⇪ drop evidence</div>
+      </div>
+      <div class="tr"><span style="width:78px"><span class="pill">TPM-06</span></span><span style="width:32px">9</span><span style="flex:1"><div class="ln" style="width:70%"></div></span><span style="width:74px;color:#8a857c;font-weight:700">— select ▾</span><span style="width:24px">·</span></div>
+      <div class="tr"><span style="width:78px"><span class="pill">TPM-09</span></span><span style="width:32px">9</span><span style="flex:1"><div class="ln" style="width:76%"></div></span><span style="width:74px;color:#8a857c;font-weight:700">N/A ▾</span><span style="width:24px">✎</span></div>
+      <div class="row" style="margin-top:8px"><span class="sub">✓ autosaved · immutable on submit</span><span class="btn p" style="margin-left:auto">Submit — locks ⚿</span></div>
+     </div>
+    </div>
+   </div>
+
+  </div>
+ </div>
+ <div class="wf-group">
+  <div class="wf-gh"><span class="gtag">B</span>Reviewer window — AI gap &amp; remediation presentation<span class="gnote">Cyber / Legal scoped · raw ⇄ AI toggle · human-in-the-loop</span></div>
+  <div class="dv-opts">
+
+   <div class="dv-opt" id="1d">
+    <div class="dv-olabel"><a class="dv-oid" href="#1d">1d</a>Three-column: controls index · vendor response · AI sidecar (tabbed Summary / Gaps / Remediation). AI stays beside the evidence, never replaces it.</div>
+    <div class="fr" style="width:620px">
+     <div class="top"><span class="dot"></span>REVIEW · CYBERSECURITY REVIEWER<span style="margin-left:12px;color:#8a857c">Acme Corp · Criticality: HIGH</span><span class="tog" style="margin-left:auto"><span class="on">RAW</span><span>AI</span></span></div>
+     <div class="body">
+      <div class="rail" style="width:120px">
+       <div class="sub">MY DOMAINS</div>
+       <div class="navi" style="font-weight:700"><span class="bul" style="background:#a3453a;border-color:#a3453a"></span>TPM-05.1 ⚠</div>
+       <div class="navi"><span class="bul" style="background:#5a7d5a;border-color:#5a7d5a"></span>TPM-01</div>
+       <div class="navi"><span class="bul" style="background:#a3453a;border-color:#a3453a"></span>TPM-06 ⚠</div>
+       <div class="navi"><span class="bul" style="background:#5a7d5a;border-color:#5a7d5a"></span>TPM-11</div>
+      </div>
+      <div class="main" style="border-right:1.4px dashed #b8b3a9;max-width:250px">
+       <div class="row"><span class="pill">TPM-05.1</span><span class="wt">wt 9</span><span class="tier" style="color:#a3453a;margin-left:auto">NON-COMP</span></div>
+       <div class="sub">VENDOR RESPONSE</div>
+       <div class="ln" style="width:92%"></div><div class="ln" style="width:80%"></div>
+       <div class="sub" style="margin-top:4px">JUSTIFICATION</div>
+       <div class="box" style="text-align:left;min-height:34px">"No formal SLA in current MSA…"</div>
+       <div class="sub">EVIDENCE · 2 files 📎</div>
+      </div>
+      <div class="main" style="background:#faf6ee;width:230px;flex:none">
+       <span class="ai">AI-GENERATED · HUMAN REVIEW REQ</span>
+       <span class="tog"><span>Summary</span><span class="on">Gaps</span><span>Fix</span></span>
+       <div class="card" style="background:#fff;gap:6px">
+        <div class="row"><span class="pill">TPM-05.1</span><span class="wt">wt 9 · HIGH</span></div>
+        <div class="ln" style="width:96%"></div><div class="ln" style="width:88%"></div><div class="ln" style="width:60%"></div>
+       </div>
+       <div class="row"><span class="btn" style="flex:1">Accept</span><span class="btn" style="flex:1">Edit</span><span class="btn" style="flex:1">Override</span></div>
+       <div class="row" style="margin-top:auto"><span class="btn p" style="flex:1">Decision ▾</span></div>
+      </div>
+     </div>
+    </div>
+   </div>
+
+   <div class="dv-opt" id="1e">
+    <div class="dv-olabel"><a class="dv-oid" href="#1e">1e</a>AI-first briefing — an exec summary up top, then ranked gap cards each carrying its own weight + inline remediation. Reviewer works top-down, toggles to raw to verify.</div>
+    <div class="fr" style="width:470px">
+     <div class="top"><span class="dot"></span>REVIEW · LEGAL REVIEWER<span class="tog" style="margin-left:auto"><span>RAW</span><span class="on">AI VIEW</span></span></div>
+     <div class="main">
+      <div class="row"><span class="ai">AI-GENERATED · HUMAN REVIEW REQUIRED</span><span class="sub" style="margin-left:auto">regenerate ⟳</span></div>
+      <div class="card" style="background:#f4f1ec">
+       <div class="h2">Executive summary — legal-scoped controls</div>
+       <div class="ln" style="width:97%"></div><div class="ln" style="width:93%"></div><div class="ln" style="width:70%"></div>
+      </div>
+      <div class="sub">RANKED GAPS · 2 non-compliant</div>
+      <div class="card" style="border-left:5px solid #a3453a">
+       <div class="row"><span class="pill">TPM-05.1</span><span class="wt">wt 9</span><span class="tier" style="color:#a3453a;margin-left:auto">CRITICAL GAP</span></div>
+       <div class="ln" style="width:90%"></div><div class="ln" style="width:74%"></div>
+       <div style="border-top:1.2px dashed #cdc8be;padding-top:7px" class="col">
+        <span class="sub">↳ REMEDIATION</span>
+        <div class="ln" style="width:95%"></div><div class="ln" style="width:66%"></div>
+       </div>
+       <div class="row"><span class="btn" style="flex:1">Accept</span><span class="btn" style="flex:1">Edit ✎</span><span class="btn" style="flex:1">Override</span></div>
+      </div>
+      <div class="card" style="border-left:5px solid #b58a3a;opacity:.7">
+       <div class="row"><span class="pill">TPM-05</span><span class="wt">wt 10</span><span class="tier" style="color:#b58a3a;margin-left:auto">MEDIUM</span></div>
+       <div class="ln" style="width:80%"></div>
+      </div>
+      <div class="row" style="margin-top:2px;border-top:1.5px solid #37342f;padding-top:9px"><span class="btn">Request info</span><span class="btn">Escalate</span><span class="btn p" style="margin-left:auto">Submit review</span></div>
+     </div>
+    </div>
+   </div>
+
+   <div class="dv-opt" id="1f">
+    <div class="dv-olabel"><a class="dv-oid" href="#1f">1f</a>Per-control accordion — each control row opens to vendor claim + AI gap + AI fix + the reviewer's own verdict, all in one place. Densest audit-trail-friendly option.</div>
+    <div class="fr" style="width:470px">
+     <div class="top"><span class="dot"></span>REVIEW · CYBERSECURITY REVIEWER<span class="tog" style="margin-left:auto"><span>RAW</span><span class="on">RAW + AI</span></span></div>
+     <div class="main" style="gap:9px">
+      <div class="row"><span class="ai">AI DRAFT · NOT A DETERMINATION</span><span class="sub" style="margin-left:auto">4 controls · 2 gaps</span></div>
+      <div class="qc" style="gap:9px">
+       <div class="row"><span class="pill">TPM-05.1</span><span class="wt">wt 9</span><span class="tier" style="color:#a3453a;margin-left:auto">NON-COMP ▾</span></div>
+       <div style="display:flex;gap:9px">
+        <div class="col" style="flex:1"><span class="sub">VENDOR CLAIM + EVIDENCE 📎</span><div class="ln" style="width:90%"></div><div class="ln" style="width:64%"></div></div>
+        <div class="col" style="flex:1;background:#faf6ee;border:1.3px dashed #a3893a;border-radius:6px;padding:8px"><span class="ai" style="align-self:flex-start">AI GAP + FIX</span><div class="ln" style="width:92%"></div><div class="ln" style="width:70%"></div></div>
+       </div>
+       <div class="row" style="border-top:1.2px dashed #cdc8be;padding-top:8px"><span class="sub">MY VERDICT</span><span class="btn" style="margin-left:auto">Accept AI</span><span class="btn">Edit</span><span class="btn">Override</span></div>
+      </div>
+      <div class="qc" style="opacity:.55;gap:5px"><div class="row"><span class="pill">TPM-06</span><span class="wt">wt 9</span><span class="tier" style="color:#a3453a;margin-left:auto">NON-COMP ▸</span></div></div>
+      <div class="qc" style="opacity:.55;gap:5px"><div class="row"><span class="pill">TPM-01</span><span class="wt">wt 10</span><span class="tier" style="color:#5a7d5a;margin-left:auto">COMPLIANT ▸</span></div></div>
+      <div class="sub">↳ every AI output + override logged to audit trail</div>
+     </div>
+    </div>
+   </div>
+
+  </div>
+ </div>
+ <div class="wf-group">
+  <div class="wf-gh"><span class="gtag">C</span>Risk Manager dashboard — aggregate score &amp; domain sub-scores<span class="gnote">final disposition authority · sees cross-domain gaps</span></div>
+  <div class="dv-opts">
+
+   <div class="dv-opt" id="1g">
+    <div class="dv-olabel"><a class="dv-oid" href="#1g">1g</a>Single-vendor verdict — normalized score hero + tier, domain sub-score bars ranked worst-first so the dragging domain is obvious, disposition bar at the base.</div>
+    <div class="fr" style="width:470px">
+     <div class="top"><span class="dot"></span>RISK MANAGER · DISPOSITION<span style="margin-left:12px;color:#8a857c">Acme Corp</span><span class="ftok" style="background:#e6b7ad;border-color:#a3453a;color:#7a2f27">HIGH RISK</span></div>
+     <div class="main">
+      <div class="row" style="align-items:flex-end;gap:14px">
+       <div class="col" style="gap:2px"><span class="sub">AGGREGATE RISK</span><div class="row" style="align-items:baseline;gap:4px"><span class="num">71</span><span class="sub">/100</span></div></div>
+       <div class="col" style="gap:3px;flex:1"><span class="sub">CRITICALITY TIER 2 · 24 controls · 4 N/A excluded</span><div class="track" style="height:14px"><div class="fill" style="width:71%;background:#b56b3a"></div></div></div>
+      </div>
+      <div class="sub" style="margin-top:4px">DOMAIN SUB-SCORES · worst first</div>
+      <div class="col" style="gap:8px">
+       <div class="row"><span style="width:110px;font-size:12px">Third-Party</span><div class="track"><div class="fill" style="width:82%;background:#a3453a"></div></div><span class="tier" style="width:34px;text-align:center;color:#a3453a">82</span></div>
+       <div class="row"><span style="width:110px;font-size:12px">Incident Resp</span><div class="track"><div class="fill" style="width:64%;background:#b56b3a"></div></div><span class="tier" style="width:34px;text-align:center;color:#b56b3a">64</span></div>
+       <div class="row"><span style="width:110px;font-size:12px">Data Security</span><div class="track"><div class="fill" style="width:38%;background:#b58a3a"></div></div><span class="tier" style="width:34px;text-align:center;color:#b58a3a">38</span></div>
+       <div class="row"><span style="width:110px;font-size:12px">Access Ctrl</span><div class="track"><div class="fill" style="width:15%;background:#5a7d5a"></div></div><span class="tier" style="width:34px;text-align:center;color:#5a7d5a">15</span></div>
+      </div>
+      <div class="row" style="margin-top:4px;border-top:1.5px solid #37342f;padding-top:10px"><span class="btn">Conditional</span><span class="btn">Reject</span><span class="btn p" style="margin-left:auto">Approve ▾</span></div>
+     </div>
+    </div>
+   </div>
+
+   <div class="dv-opt" id="1h">
+    <div class="dv-olabel"><a class="dv-oid" href="#1h">1h</a>Portfolio table — every vendor as a row with score, tier, the single worst domain, review status. The Risk Manager's queue; drill into any row for <a class="dv-oid" href="#1g">1g</a>.</div>
+    <div class="fr" style="width:530px">
+     <div class="top"><span class="dot"></span>RISK MANAGER · VENDOR PORTFOLIO<span class="sub" style="margin-left:auto;color:#8a857c">SORT: RISK ▾</span></div>
+     <div class="main" style="padding:13px">
+      <div class="th"><span style="flex:1">VENDOR</span><span style="width:70px">SCORE</span><span style="width:74px">TIER</span><span style="width:120px">WORST DOMAIN</span><span style="width:78px">STATUS</span></div>
+      <div class="tr"><span style="flex:1;font-weight:700">Acme Corp</span><span style="width:70px"><div class="track" style="width:44px;display:inline-block;vertical-align:middle"><div class="fill" style="width:71%;background:#b56b3a"></div></div> 71</span><span style="width:74px"><span class="tier" style="color:#a3453a">HIGH</span></span><span style="width:120px">Third-Party 82</span><span style="width:78px;color:#b58a3a">Reviewing</span></div>
+      <div class="tr"><span style="flex:1;font-weight:700">Nomad LLC</span><span style="width:70px"><div class="track" style="width:44px;display:inline-block;vertical-align:middle"><div class="fill" style="width:91%;background:#a3453a"></div></div> 91</span><span style="width:74px"><span class="tier" style="color:#7a2f27;background:#e6b7ad">CRIT</span></span><span style="width:120px">Incident 88</span><span style="width:78px;color:#a3453a">Escalated</span></div>
+      <div class="tr"><span style="flex:1;font-weight:700">Beacon Inc</span><span style="width:70px"><div class="track" style="width:44px;display:inline-block;vertical-align:middle"><div class="fill" style="width:42%;background:#b58a3a"></div></div> 42</span><span style="width:74px"><span class="tier" style="color:#b58a3a">MED</span></span><span style="width:120px">Data Sec 51</span><span style="width:78px;color:#5a7d5a">Ready</span></div>
+      <div class="tr"><span style="flex:1;font-weight:700">Cirro Ltd</span><span style="width:70px"><div class="track" style="width:44px;display:inline-block;vertical-align:middle"><div class="fill" style="width:19%;background:#5a7d5a"></div></div> 19</span><span style="width:74px"><span class="tier" style="color:#5a7d5a">LOW</span></span><span style="width:120px">— none flagged</span><span style="width:78px;color:#5a7d5a">Approved</span></div>
+      <div class="tr" style="border:none"><span style="flex:1;font-weight:700">Delta Sys</span><span style="width:70px"><div class="track" style="width:44px;display:inline-block;vertical-align:middle"><div class="fill" style="width:0%"></div></div> —</span><span style="width:74px"><span class="tier" style="color:#8a857c">—</span></span><span style="width:120px;color:#8a857c">awaiting vendor</span><span style="width:78px;color:#8a857c">Sent</span></div>
+     </div>
+    </div>
+   </div>
+
+   <div class="dv-opt" id="1i">
+    <div class="dv-olabel"><a class="dv-oid" href="#1i">1i</a>Contribution breakdown — one segmented bar shows exactly how much each domain's non-compliant weight adds to the 0–100 score. Makes "why 71?" defensible.</div>
+    <div class="fr" style="width:470px">
+     <div class="top"><span class="dot"></span>RISK MANAGER · SCORE BREAKDOWN<span style="margin-left:auto;color:#8a857c">Acme Corp</span></div>
+     <div class="main">
+      <div class="row" style="align-items:baseline;gap:6px"><span class="num">71</span><span class="sub">/100 · weighted, N/A excluded from denominator</span></div>
+      <div class="sub">RISK CONTRIBUTION BY DOMAIN</div>
+      <div style="display:flex;height:26px;border:1.4px solid #37342f;border-radius:7px;overflow:hidden">
+       <div style="width:46%;background:#a3453a"></div><div style="width:26%;background:#b56b3a"></div><div style="width:18%;background:#b58a3a"></div><div style="width:10%;background:#5a7d5a"></div>
+      </div>
+      <div class="col" style="gap:6px;margin-top:2px">
+       <div class="row"><span style="width:12px;height:12px;background:#a3453a;border:1.2px solid #37342f;border-radius:2px"></span><span style="flex:1;font-size:12px">Third-Party Mgmt</span><span class="sub">+33 · TPM-05.1, TPM-06 non-comp</span></div>
+       <div class="row"><span style="width:12px;height:12px;background:#b56b3a;border:1.2px solid #37342f;border-radius:2px"></span><span style="flex:1;font-size:12px">Incident Response</span><span class="sub">+18</span></div>
+       <div class="row"><span style="width:12px;height:12px;background:#b58a3a;border:1.2px solid #37342f;border-radius:2px"></span><span style="flex:1;font-size:12px">Data Security</span><span class="sub">+13</span></div>
+       <div class="row"><span style="width:12px;height:12px;background:#5a7d5a;border:1.2px solid #37342f;border-radius:2px"></span><span style="flex:1;font-size:12px">Access Control</span><span class="sub">+7</span></div>
+      </div>
+      <div class="box" style="text-align:left;border-color:#a3893a;background:#faf6ee;margin-top:2px"><span class="ai">AI</span> &nbsp;Cross-domain note: 2 of top-3 gaps share a contract-clause root cause →</div>
+     </div>
+    </div>
+   </div>
+
+  </div>
+ </div>
+ <div class="wf-group">
+  <div class="wf-gh"><span class="gtag">D</span>Admin console — control library, weightings &amp; routing<span class="gnote">reference layout · one direction</span></div>
+  <div class="dv-opts">
+
+   <div class="dv-opt" id="1j">
+    <div class="dv-olabel"><a class="dv-oid" href="#1j">1j</a>Control library as the spine — SCF mapping + editable weight per control, with tabs across to Question bank, Vendor assignments, and Stakeholder routing.</div>
+    <div class="fr" style="width:600px">
+     <div class="top"><span class="dot"></span>ADMIN · GRC PLATFORM<span style="margin-left:12px;color:#8a857c">SCF 2026.1</span></div>
+     <div class="row" style="gap:0;border-bottom:1.4px solid #37342f;background:#efece6">
+      <span class="tog" style="border:none;border-radius:0"><span class="on" style="border-right:1.4px solid #37342f">Control library</span></span>
+      <span style="font:700 9.5px 'Space Mono';padding:8px 12px;color:#6b665e">Question bank</span>
+      <span style="font:700 9.5px 'Space Mono';padding:8px 12px;color:#6b665e">Assignments</span>
+      <span style="font:700 9.5px 'Space Mono';padding:8px 12px;color:#6b665e">Routing</span>
+     </div>
+     <div class="main" style="padding:13px">
+      <div class="row"><span class="sub">FILTER: TPM DOMAIN ▾</span><span class="btn" style="margin-left:auto">+ Custom control</span></div>
+      <div class="th"><span style="width:88px">CTRL ID</span><span style="flex:1">CONTROL</span><span style="width:60px">SOURCE</span><span style="width:120px">WEIGHT 1–10</span><span style="width:80px">ROUTES TO</span></div>
+      <div class="tr"><span style="width:88px"><span class="pill">TPM-04.4</span></span><span style="flex:1"><div class="ln" style="width:78%"></div></span><span style="width:60px">SCF</span><span style="width:120px"><div class="row"><div class="track" style="width:60px"><div class="fill" style="width:100%;background:#37342f"></div></div><span style="font-weight:700">10</span></div></span><span style="width:80px;font-size:10px">Legal</span></div>
+      <div class="tr"><span style="width:88px"><span class="pill">TPM-05</span></span><span style="flex:1"><div class="ln" style="width:70%"></div></span><span style="width:60px">SCF</span><span style="width:120px"><div class="row"><div class="track" style="width:60px"><div class="fill" style="width:100%;background:#37342f"></div></div><span style="font-weight:700">10</span></div></span><span style="width:80px;font-size:10px">Legal</span></div>
+      <div class="tr"><span style="width:88px"><span class="pill">TPM-05.1</span></span><span style="flex:1"><div class="ln" style="width:82%"></div></span><span style="width:60px">SCF</span><span style="width:120px"><div class="row"><div class="track" style="width:60px"><div class="fill" style="width:90%;background:#37342f"></div></div><span style="font-weight:700">9</span></div></span><span style="width:80px;font-size:10px">Legal+Cyber</span></div>
+      <div class="tr"><span style="width:88px"><span class="pill">TPM-06</span></span><span style="flex:1"><div class="ln" style="width:66%"></div></span><span style="width:60px">SCF</span><span style="width:120px"><div class="row"><div class="track" style="width:60px"><div class="fill" style="width:90%;background:#37342f"></div></div><span style="font-weight:700">9</span></div></span><span style="width:80px;font-size:10px">Cyber</span></div>
+      <div class="tr" style="border:none"><span style="width:88px"><span class="pill" style="background:#e0c9a6;border-color:#a3572f">CUS-02</span></span><span style="flex:1"><div class="ln" style="width:58%"></div></span><span style="width:60px;color:#a3572f">custom</span><span style="width:120px"><div class="row"><div class="track" style="width:60px"><div class="fill" style="width:70%;background:#37342f"></div></div><span style="font-weight:700">7</span></div></span><span style="width:80px;font-size:10px">Cyber</span></div>
+      <div class="sub" style="margin-top:8px">↳ weight edits are versioned · re-scoring is non-retroactive on locked submissions</div>
+     </div>
+    </div>
+   </div>
+
+  </div>
+ </div>
+
+ <p class="dv-next">Try next: <b>"expand <a class="dv-oid" href="#1e">1e</a> into a full reviewer screen"</b> · <b>"combine <a class="dv-oid" href="#1a">1a</a>'s rail with <a class="dv-oid" href="#1c">1c</a>'s density"</b> · <b>"take <a class="dv-oid" href="#1g">1g</a> to mid-fi"</b> · <b>"new directions for the AI panel"</b> · or name a surface to go deeper.</p>
+</section>
+</x-dc>
+</body>
+</html>

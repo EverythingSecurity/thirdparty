@@ -1,0 +1,23 @@
+**/node_modules
+**/dist
+**/build
+**/coverage
+**/.tsbuildinfo
+
+.env
+.env.*
+!.env.example
+
+.git
+.github
+.claude
+.vscode
+.idea
+
+**/*.log
+**/.DS_Store
+**/*.md
+!README.md
+
+# Storage for local dev evidence — never bake into images.
+.storage/
