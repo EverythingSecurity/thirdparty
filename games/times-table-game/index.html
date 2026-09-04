@@ -64,16 +64,16 @@
   /* ---- Screen: setup ---- */
   #setup-screen .tables-grid {
     display: grid;
-    grid-template-columns: repeat(4, 1fr);
-    gap: 10px;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 8px;
     margin: 16px 0 22px;
   }
   .table-chip {
     border: 3px solid #eee;
     background: #f7f7ff;
-    border-radius: 14px;
-    padding: 12px 0;
-    font-size: 20px;
+    border-radius: 12px;
+    padding: 10px 0;
+    font-size: 16px;
     font-weight: bold;
     cursor: pointer;
     transition: transform 0.15s ease, background 0.15s ease, border-color 0.15s ease;
@@ -362,8 +362,8 @@
   var praises = ["Awesome!", "Nice one!", "You got it!", "Super!", "Brilliant!", "Great job!"];
   var encouragements = ["Almost!", "So close!", "Keep going!", "Try the next one!"];
 
-  // Build table chips 1-12
-  for (var t = 1; t <= 12; t++) {
+  // Build table chips 1-19
+  for (var t = 1; t <= 19; t++) {
     (function (n) {
       var chip = document.createElement("div");
       chip.className = "table-chip";
