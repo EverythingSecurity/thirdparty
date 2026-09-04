@@ -1,0 +1,607 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Times Table Adventure</title>
+<style>
+  :root {
+    --bg1: #6a5cff;
+    --bg2: #ff6ec7;
+    --card: #ffffff;
+    --ink: #2b2350;
+    --good: #2ecc71;
+    --bad: #ff5b5b;
+    --accent: #ffb703;
+  }
+  * { box-sizing: border-box; }
+  html, body {
+    margin: 0;
+    padding: 0;
+    height: 100%;
+    font-family: "Trebuchet MS", "Segoe UI", Verdana, sans-serif;
+    background: linear-gradient(135deg, var(--bg1), var(--bg2));
+    background-size: 200% 200%;
+    animation: gradientShift 12s ease infinite;
+    color: var(--ink);
+    overflow-x: hidden;
+  }
+  @keyframes gradientShift {
+    0% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+    100% { background-position: 0% 50%; }
+  }
+  .wrap {
+    min-height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 24px;
+  }
+  .card {
+    background: var(--card);
+    border-radius: 28px;
+    box-shadow: 0 20px 50px rgba(0,0,0,0.25);
+    width: 100%;
+    max-width: 520px;
+    padding: 28px 28px 24px;
+    position: relative;
+    overflow: hidden;
+  }
+  h1 {
+    text-align: center;
+    margin: 0 0 4px;
+    font-size: 28px;
+    color: var(--bg1);
+  }
+  .subtitle {
+    text-align: center;
+    margin: 0 0 20px;
+    font-size: 14px;
+    opacity: 0.7;
+  }
+
+  /* ---- Screen: setup ---- */
+  #setup-screen .tables-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 10px;
+    margin: 16px 0 22px;
+  }
+  .table-chip {
+    border: 3px solid #eee;
+    background: #f7f7ff;
+    border-radius: 14px;
+    padding: 12px 0;
+    font-size: 20px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: transform 0.15s ease, background 0.15s ease, border-color 0.15s ease;
+    user-select: none;
+  }
+  .table-chip:hover { transform: translateY(-2px); }
+  .table-chip.selected {
+    background: var(--bg1);
+    color: white;
+    border-color: var(--bg1);
+    transform: scale(1.05);
+  }
+  .row-label {
+    font-weight: bold;
+    font-size: 13px;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    opacity: 0.6;
+    margin: 14px 0 6px;
+  }
+  .difficulty-grid, .qcount-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 10px;
+    margin-bottom: 18px;
+  }
+  .pill {
+    border: 3px solid #eee;
+    background: #f7f7ff;
+    border-radius: 14px;
+    padding: 10px 0;
+    font-size: 15px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: all 0.15s ease;
+  }
+  .pill.selected {
+    background: var(--accent);
+    color: #4a3300;
+    border-color: var(--accent);
+    transform: scale(1.05);
+  }
+  button.big-btn {
+    width: 100%;
+    padding: 16px;
+    font-size: 20px;
+    font-weight: bold;
+    border: none;
+    border-radius: 16px;
+    background: linear-gradient(135deg, var(--bg1), var(--bg2));
+    color: white;
+    cursor: pointer;
+    box-shadow: 0 8px 18px rgba(106, 92, 255, 0.4);
+    transition: transform 0.1s ease;
+  }
+  button.big-btn:active { transform: scale(0.97); }
+  button.big-btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    box-shadow: none;
+  }
+
+  /* ---- Screen: game ---- */
+  #game-screen { display: none; }
+  .hud {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 18px;
+    font-size: 14px;
+    font-weight: bold;
+  }
+  .hud .stat { display: flex; flex-direction: column; align-items: center; gap: 2px; }
+  .hud .stat .val { font-size: 20px; }
+  .progress-bar-bg {
+    width: 100%;
+    height: 10px;
+    border-radius: 6px;
+    background: #eee;
+    overflow: hidden;
+    margin-bottom: 22px;
+  }
+  .progress-bar-fill {
+    height: 100%;
+    width: 0%;
+    background: linear-gradient(90deg, var(--good), #58d68d);
+    transition: width 0.3s ease;
+  }
+  .question-box {
+    text-align: center;
+    margin-bottom: 26px;
+  }
+  .mascot {
+    font-size: 46px;
+    margin-bottom: 4px;
+    display: inline-block;
+    animation: bob 1.6s ease-in-out infinite;
+  }
+  @keyframes bob {
+    0%, 100% { transform: translateY(0) rotate(0deg); }
+    50% { transform: translateY(-6px) rotate(-4deg); }
+  }
+  .equation {
+    font-size: 44px;
+    font-weight: 900;
+    color: var(--bg1);
+    letter-spacing: 1px;
+  }
+  .answers-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 14px;
+  }
+  .answer-btn {
+    padding: 20px 0;
+    font-size: 26px;
+    font-weight: bold;
+    border: 3px solid #eee;
+    border-radius: 16px;
+    background: #f7f7ff;
+    color: var(--ink);
+    cursor: pointer;
+    transition: transform 0.12s ease, background 0.12s ease, border-color 0.12s ease;
+  }
+  .answer-btn:hover:not(:disabled) { transform: translateY(-3px); }
+  .answer-btn:disabled { cursor: default; }
+  .answer-btn.correct {
+    background: var(--good);
+    border-color: var(--good);
+    color: white;
+    animation: pop 0.3s ease;
+  }
+  .answer-btn.wrong {
+    background: var(--bad);
+    border-color: var(--bad);
+    color: white;
+    animation: shake 0.35s ease;
+  }
+  @keyframes pop {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.12); }
+    100% { transform: scale(1); }
+  }
+  @keyframes shake {
+    0%, 100% { transform: translateX(0); }
+    25% { transform: translateX(-8px); }
+    75% { transform: translateX(8px); }
+  }
+  .feedback {
+    text-align: center;
+    min-height: 26px;
+    font-size: 16px;
+    font-weight: bold;
+    margin-top: 14px;
+  }
+  .feedback.good { color: var(--good); }
+  .feedback.bad { color: var(--bad); }
+
+  /* ---- Screen: results ---- */
+  #results-screen { display: none; text-align: center; }
+  #results-screen .big-emoji { font-size: 64px; margin-bottom: 6px; }
+  #results-screen h2 { margin: 0 0 6px; color: var(--bg1); }
+  .score-line { font-size: 40px; font-weight: 900; margin: 10px 0; color: var(--accent); }
+  .stars { font-size: 34px; margin-bottom: 16px; letter-spacing: 4px; }
+  .summary-line { font-size: 14px; opacity: 0.75; margin-bottom: 22px; }
+  .results-buttons { display: flex; gap: 10px; }
+  .results-buttons button { flex: 1; }
+  button.secondary-btn {
+    padding: 14px;
+    font-size: 15px;
+    font-weight: bold;
+    border: 3px solid var(--bg1);
+    border-radius: 14px;
+    background: white;
+    color: var(--bg1);
+    cursor: pointer;
+  }
+
+  .confetti-piece {
+    position: fixed;
+    top: -10px;
+    width: 10px;
+    height: 16px;
+    opacity: 0.9;
+    pointer-events: none;
+    animation: fall linear forwards;
+    z-index: 5;
+  }
+  @keyframes fall {
+    to { transform: translateY(110vh) rotate(360deg); opacity: 0.3; }
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="card">
+
+    <div id="setup-screen">
+      <h1>🚀 Times Table Adventure</h1>
+      <p class="subtitle">Pick your tables and blast off into multiplication practice!</p>
+
+      <div class="row-label">Choose your tables (tap to select one or more)</div>
+      <div class="tables-grid" id="tables-grid"></div>
+
+      <div class="row-label">Difficulty</div>
+      <div class="difficulty-grid" id="difficulty-grid">
+        <div class="pill" data-secs="0">😌 Relaxed</div>
+        <div class="pill selected" data-secs="10">🙂 Normal</div>
+        <div class="pill" data-secs="5">🔥 Speedy</div>
+      </div>
+
+      <div class="row-label">How many questions?</div>
+      <div class="qcount-grid" id="qcount-grid">
+        <div class="pill" data-count="10">10</div>
+        <div class="pill selected" data-count="15">15</div>
+        <div class="pill" data-count="20">20</div>
+      </div>
+
+      <button class="big-btn" id="start-btn" disabled>Pick a table to start!</button>
+    </div>
+
+    <div id="game-screen">
+      <div class="hud">
+        <div class="stat">⭐ Score<span class="val" id="hud-score">0</span></div>
+        <div class="stat">❓ Question<span class="val" id="hud-progress">1/10</span></div>
+        <div class="stat">🔥 Streak<span class="val" id="hud-streak">0</span></div>
+      </div>
+      <div class="progress-bar-bg"><div class="progress-bar-fill" id="progress-fill"></div></div>
+
+      <div class="question-box">
+        <div class="mascot" id="mascot">🦊</div>
+        <div class="equation" id="equation">? × ? = ?</div>
+      </div>
+
+      <div class="answers-grid" id="answers-grid"></div>
+      <div class="feedback" id="feedback"></div>
+    </div>
+
+    <div id="results-screen">
+      <div class="big-emoji" id="results-emoji">🏆</div>
+      <h2>Great job!</h2>
+      <div class="score-line" id="final-score">0 / 0</div>
+      <div class="stars" id="results-stars">⭐⭐⭐</div>
+      <div class="summary-line" id="results-summary"></div>
+      <div class="results-buttons">
+        <button class="secondary-btn" id="menu-btn">🏠 Menu</button>
+        <button class="big-btn" id="replay-btn">🔁 Play Again</button>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<script>
+(function () {
+  "use strict";
+
+  var setupScreen = document.getElementById("setup-screen");
+  var gameScreen = document.getElementById("game-screen");
+  var resultsScreen = document.getElementById("results-screen");
+
+  var tablesGrid = document.getElementById("tables-grid");
+  var difficultyGrid = document.getElementById("difficulty-grid");
+  var qcountGrid = document.getElementById("qcount-grid");
+  var startBtn = document.getElementById("start-btn");
+
+  var hudScore = document.getElementById("hud-score");
+  var hudProgress = document.getElementById("hud-progress");
+  var hudStreak = document.getElementById("hud-streak");
+  var progressFill = document.getElementById("progress-fill");
+  var equationEl = document.getElementById("equation");
+  var answersGrid = document.getElementById("answers-grid");
+  var feedbackEl = document.getElementById("feedback");
+  var mascotEl = document.getElementById("mascot");
+
+  var finalScoreEl = document.getElementById("final-score");
+  var resultsStars = document.getElementById("results-stars");
+  var resultsSummary = document.getElementById("results-summary");
+  var resultsEmoji = document.getElementById("results-emoji");
+
+  var selectedTables = [];
+  var secondsPerQuestion = 10;
+  var totalQuestions = 15;
+
+  var mascots = ["🦊", "🐸", "🐼", "🐵", "🐯", "🦄", "🐶", "🐱"];
+  var praises = ["Awesome!", "Nice one!", "You got it!", "Super!", "Brilliant!", "Great job!"];
+  var encouragements = ["Almost!", "So close!", "Keep going!", "Try the next one!"];
+
+  // Build table chips 1-12
+  for (var t = 1; t <= 12; t++) {
+    (function (n) {
+      var chip = document.createElement("div");
+      chip.className = "table-chip";
+      chip.textContent = "×" + n;
+      chip.addEventListener("click", function () {
+        chip.classList.toggle("selected");
+        var idx = selectedTables.indexOf(n);
+        if (chip.classList.contains("selected") && idx === -1) {
+          selectedTables.push(n);
+        } else if (!chip.classList.contains("selected") && idx !== -1) {
+          selectedTables.splice(idx, 1);
+        }
+        updateStartButton();
+      });
+      tablesGrid.appendChild(chip);
+    })(t);
+  }
+
+  function updateStartButton() {
+    if (selectedTables.length === 0) {
+      startBtn.disabled = true;
+      startBtn.textContent = "Pick a table to start!";
+    } else {
+      startBtn.disabled = false;
+      startBtn.textContent = "Start Game! 🎮";
+    }
+  }
+
+  difficultyGrid.querySelectorAll(".pill").forEach(function (pill) {
+    pill.addEventListener("click", function () {
+      difficultyGrid.querySelectorAll(".pill").forEach(function (p) { p.classList.remove("selected"); });
+      pill.classList.add("selected");
+      secondsPerQuestion = parseInt(pill.getAttribute("data-secs"), 10);
+    });
+  });
+
+  qcountGrid.querySelectorAll(".pill").forEach(function (pill) {
+    pill.addEventListener("click", function () {
+      qcountGrid.querySelectorAll(".pill").forEach(function (p) { p.classList.remove("selected"); });
+      pill.classList.add("selected");
+      totalQuestions = parseInt(pill.getAttribute("data-count"), 10);
+    });
+  });
+
+  // ---- Game state ----
+  var questions = [];
+  var currentIndex = 0;
+  var score = 0;
+  var streak = 0;
+  var bestStreak = 0;
+  var timerId = null;
+  var timeLeft = 0;
+  var answered = false;
+
+  function shuffle(arr) {
+    for (var i = arr.length - 1; i > 0; i--) {
+      var j = Math.floor(Math.random() * (i + 1));
+      var tmp = arr[i]; arr[i] = arr[j]; arr[j] = tmp;
+    }
+    return arr;
+  }
+
+  function buildQuestions() {
+    var pool = [];
+    selectedTables.forEach(function (table) {
+      for (var m = 1; m <= 12; m++) {
+        pool.push({ a: table, b: m });
+      }
+    });
+    shuffle(pool);
+    var picked = [];
+    for (var i = 0; i < totalQuestions; i++) {
+      picked.push(pool[i % pool.length]);
+    }
+    return shuffle(picked);
+  }
+
+  function generateChoices(correct) {
+    var choices = [correct];
+    while (choices.length < 4) {
+      var delta = Math.floor(Math.random() * 10) - 5;
+      if (delta === 0) delta = 3;
+      var candidate = correct + delta * (Math.floor(Math.random() * 3) + 1);
+      if (candidate < 0) candidate = correct + Math.abs(delta);
+      if (candidate !== correct && choices.indexOf(candidate) === -1) {
+        choices.push(candidate);
+      }
+    }
+    return shuffle(choices);
+  }
+
+  function startGame() {
+    questions = buildQuestions();
+    currentIndex = 0;
+    score = 0;
+    streak = 0;
+    bestStreak = 0;
+    setupScreen.style.display = "none";
+    resultsScreen.style.display = "none";
+    gameScreen.style.display = "block";
+    showQuestion();
+  }
+
+  function showQuestion() {
+    answered = false;
+    clearInterval(timerId);
+    feedbackEl.textContent = "";
+    feedbackEl.className = "feedback";
+    mascotEl.textContent = mascots[Math.floor(Math.random() * mascots.length)];
+
+    var q = questions[currentIndex];
+    var correct = q.a * q.b;
+    equationEl.textContent = q.a + " × " + q.b + " = ?";
+
+    var choices = generateChoices(correct);
+    answersGrid.innerHTML = "";
+    choices.forEach(function (choice) {
+      var btn = document.createElement("button");
+      btn.className = "answer-btn";
+      btn.textContent = choice;
+      btn.addEventListener("click", function () {
+        handleAnswer(btn, choice, correct);
+      });
+      answersGrid.appendChild(btn);
+    });
+
+    hudScore.textContent = score;
+    hudStreak.textContent = streak;
+    hudProgress.textContent = (currentIndex + 1) + "/" + totalQuestions;
+    progressFill.style.width = ((currentIndex) / totalQuestions * 100) + "%";
+
+    if (secondsPerQuestion > 0) {
+      timeLeft = secondsPerQuestion;
+      timerId = setInterval(function () {
+        timeLeft--;
+        if (timeLeft <= 0) {
+          clearInterval(timerId);
+          if (!answered) {
+            handleAnswer(null, null, correct);
+          }
+        }
+      }, 1000);
+    }
+  }
+
+  function handleAnswer(btnEl, chosen, correct) {
+    if (answered) return;
+    answered = true;
+    clearInterval(timerId);
+
+    var allBtns = answersGrid.querySelectorAll(".answer-btn");
+    allBtns.forEach(function (b) {
+      b.disabled = true;
+      if (parseInt(b.textContent, 10) === correct) {
+        b.classList.add("correct");
+      }
+    });
+
+    if (chosen === correct) {
+      score++;
+      streak++;
+      bestStreak = Math.max(bestStreak, streak);
+      feedbackEl.textContent = "✅ " + praises[Math.floor(Math.random() * praises.length)];
+      feedbackEl.className = "feedback good";
+      if (streak > 0 && streak % 5 === 0) {
+        launchConfetti();
+      }
+    } else {
+      streak = 0;
+      if (btnEl) btnEl.classList.add("wrong");
+      feedbackEl.textContent = "❌ " + encouragements[Math.floor(Math.random() * encouragements.length)] + " The answer was " + correct + ".";
+      feedbackEl.className = "feedback bad";
+    }
+
+    hudScore.textContent = score;
+    hudStreak.textContent = streak;
+    progressFill.style.width = ((currentIndex + 1) / totalQuestions * 100) + "%";
+
+    setTimeout(function () {
+      currentIndex++;
+      if (currentIndex < totalQuestions) {
+        showQuestion();
+      } else {
+        showResults();
+      }
+    }, 1100);
+  }
+
+  function showResults() {
+    gameScreen.style.display = "none";
+    resultsScreen.style.display = "block";
+    finalScoreEl.textContent = score + " / " + totalQuestions;
+
+    var pct = score / totalQuestions;
+    var stars = pct >= 0.9 ? 3 : pct >= 0.6 ? 2 : pct >= 0.3 ? 1 : 0;
+    resultsStars.textContent = "⭐".repeat(stars) + "☆".repeat(3 - stars);
+
+    if (pct >= 0.9) {
+      resultsEmoji.textContent = "🏆";
+      resultsSummary.textContent = "Amazing! Best streak: " + bestStreak + ". You're a multiplication master!";
+    } else if (pct >= 0.6) {
+      resultsEmoji.textContent = "🎉";
+      resultsSummary.textContent = "Great work! Best streak: " + bestStreak + ". Keep practicing to master it!";
+    } else {
+      resultsEmoji.textContent = "💪";
+      resultsSummary.textContent = "Good try! Best streak: " + bestStreak + ". Practice makes perfect — go again!";
+    }
+
+    if (pct >= 0.6) {
+      launchConfetti();
+    }
+  }
+
+  function launchConfetti() {
+    var colors = ["#ff6ec7", "#6a5cff", "#ffb703", "#2ecc71", "#ff5b5b"];
+    for (var i = 0; i < 40; i++) {
+      var piece = document.createElement("div");
+      piece.className = "confetti-piece";
+      piece.style.left = Math.random() * 100 + "vw";
+      piece.style.background = colors[Math.floor(Math.random() * colors.length)];
+      piece.style.animationDuration = (2 + Math.random() * 1.5) + "s";
+      piece.style.borderRadius = Math.random() > 0.5 ? "50%" : "2px";
+      document.body.appendChild(piece);
+      (function (el) {
+        setTimeout(function () { el.remove(); }, 4000);
+      })(piece);
+    }
+  }
+
+  document.getElementById("start-btn").addEventListener("click", startGame);
+  document.getElementById("replay-btn").addEventListener("click", startGame);
+  document.getElementById("menu-btn").addEventListener("click", function () {
+    resultsScreen.style.display = "none";
+    setupScreen.style.display = "block";
+  });
+
+  updateStartButton();
+})();
+</script>
+</body>
+</html>
